@@ -3,6 +3,8 @@ from wsgiref.simple_server import make_server
 import settings
 import imp
 
+from base import Request
+
 
 def view_404(environ, start_response):
     status = '404 NOT FOUND'
@@ -13,6 +15,7 @@ def view_404(environ, start_response):
     ]
     return (status, headers, body,)
 
+
 def view_500(error):
     status = '500 INTERNAL SERVER ERROR'
     body = '<h2>INTERNAL SERVER ERROR</h2>\n{}'.format(error.message)
@@ -21,12 +24,14 @@ def view_500(error):
         ('Content-Length', str(len(body)))
     ]
     return (status, headers, body,)
+
+
 def application(environ, start_response):
     view = get_view(environ)
-    try:
-        status, headers, body = view(environ, start_response)
-    except Exception, error:
-        status, headers, body = view_500(error)
+    # try:
+    status, headers, body = view(Request(environ))
+    # except Exception, error:
+    #     status, headers, body = view_500(error)
     start_response(status, headers)
     return body
 
