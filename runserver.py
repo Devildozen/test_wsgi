@@ -4,7 +4,7 @@ import settings
 import imp
 
 
-def view_404():
+def view_404(environ, start_response):
     status = '404 NOT FOUND'
     body = '<h1>This page not found<h1>'
     headers = [
@@ -13,7 +13,14 @@ def view_404():
     ]
     return (status, headers, body,)
 
-
+def view_500(error):
+    status = '500 INTERNAL SERVER ERROR'
+    body = '<h2>INTERNAL SERVER ERROR</h2>\n{}'.format(error.message)
+    headers = [
+        ('Content-Type', 'text/html'),
+        ('Content-Length', str(len(body)))
+    ]
+    return (status, headers, body,)
 def application(environ, start_response):
     # body = '\n'.join(['%s: %s' % (key, value) for key, value in sorted(environ.items())])
     # body = [
@@ -33,12 +40,7 @@ def application(environ, start_response):
     try:
         status, headers, body = view(environ, start_response)
     except Exception, error:
-        status = '500 INTERNAL SERVER ERROR'
-        body = error.message
-        headers = [
-            ('Content-Type', 'text/plain'),
-            ('Content-Length', str(len(body)))
-        ]
+        status, headers, body = view_500(error)
     start_response(status, headers)
     return body
 
