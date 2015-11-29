@@ -4,12 +4,20 @@ class Response(object):
     def __init__(self, status=None, body=None, headers=None):
         self.status = status or '200 OK'
         self.body = body or ''
+        self.head = '<ul>' \
+                    '<li><a href="/">Index</a></li>' \
+                    '<li><a href="/get/">GET</a></li>' \
+                    '<li><a href="/post/">POST</a></li>' \
+                    '<li><a href="/test_class/">ClassView</a></li>' \
+                    '</ul>'
         self.headers = headers or self.get_headers()
 
     def get_headers(self):
         if isinstance(self.body, (str, unicode)):
+            self.body = self.head + self.body
             content_len = len(self.body)
         elif isinstance(self.body, (list, tuple, set)):
+            self.body = list(self.head) + list(self.body)
             content_len = sum([len(i) for i in self.body])
         else:
             raise BaseException
@@ -23,10 +31,9 @@ class Response(object):
         return (self.status, self.headers, self.body)
 
 class Request(object):
-    raw_data = ''
-    data = dict()
-
     def __init__(self, environ):
+        self.raw_data = ''
+        self.data = dict()
         self.environ = environ
         self.method = environ['REQUEST_METHOD']
         self.content_length = int(self.environ.get('CONTENT_LENGTH') or '0')

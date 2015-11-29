@@ -9,7 +9,7 @@ def url(url, view):
 
 urls = [
     url(r'^/$', views.index),
-    url(r'^/test_get/$', views.test_get_view),
-    url(r'^/test_post/$', views.test_post_view),
+    url(r'^/get/$', views.test_get_view),
+    url(r'^/post/$', views.test_post_view),
     url(r'^/test_class/$', views.TestView.as_view()),
 ]

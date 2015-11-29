@@ -2,39 +2,41 @@
 from base import Response, BaseView
 
 def test_get_view(request):
-    body = str(request.data)
+    body = '<h4>Test GET request</h4><br>Params: {}'.format(str(request.data))
     return Response(body=body).response()
 
-def test_post_view(environ, start_response):
-    body = '<form method="POST" action="/">' \
+def test_post_view(request):
+    body = '<h4>Test POST request</h4><br>' \
+           '<form method="POST" action="/test_class/">' \
            'Some text: <input name="test_input" /><br>' \
            'Some text: <input name="test_input2" /><br>' \
            '<input type="submit" />' \
            '</form>'
-    status = '200 OK'
-    headers = [
-        ('Content-Type', 'text/html'),
-        ('Content-Length', str(len(body)))
-    ]
-    return (status, headers, body)
+    # status = '200 OK'
+    # headers = [
+    #     ('Content-Type', 'text/html'),
+    #     ('Content-Length', str(len(body)))
+    # ]
+    return Response(body=body).response()
+    # return (status, headers, body)
 
 
-def index(environ, start_response):
-    body = '\n'.join(['%s: %s' % (key, value) for key, value in sorted(environ.items())])
-    length = int(environ.get('CONTENT_LENGTH') or '0')
+def index(request):
+    body = ''.join(['<div><span style="width:150px;">%s:</span> %s</div>' % (key, value) for key, value in sorted(request.environ.items())])
+    length = int(request.environ.get('CONTENT_LENGTH') or '0')
     body = [
-        'The Beggining\n',
-        '*' * 30 + '\n',
-        environ['wsgi.input'].read(length),
-        '\n' + '*' * 30 + '\n',
+        '<h4>All environment variables</h4>\n',
+        '*' * 30 + '<br>',
+        request.environ['wsgi.input'].read(length),
+        '<br>' + '*' * 30 + '<br>',
         body,
-        '\n' + '*' * 30 ,
-        '\nThe End'
+        '<br>' + '*' * 30 ,
+        '<br>The End'
     ]
     content_length = sum([len(s) for s in body])
     status = '200 OK'
     headers = [
-        ('Content-Type', 'text/plain'),
+        ('Content-Type', 'text/html'),
         ('Content-Length', str(content_length))
     ]
     # body = 'index page'
@@ -43,14 +45,19 @@ def index(environ, start_response):
     #     ('Content-Type', 'text/plain'),
     #     ('Content-Length', str(len(body)))
     # ]
-    return Response(body=body, headers=headers).response()
+    return Response(body=body).response()
     # return (status, headers, body)
 #
 class TestView(BaseView):
     def get(self, request):
-        body = str(request.data)
+        body = '<h4>Test ClassView with GET request</h4>' \
+               '<br>Params: {}'.format(str(request.data))
         return Response(body=body).response()
 
+    def post(self, request):
+        body = '<h4>Test ClassView with POST request</h4>' \
+               '<br>Params: {}'.format(str(request.data))
+        return Response(body=body).response()
 
 class classonlymethod(classmethod):
     def __get__(self, instance, owner):

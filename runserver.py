@@ -6,7 +6,7 @@ import imp
 from base import Request
 
 
-def view_404(environ, start_response):
+def view_404(request):
     status = '404 NOT FOUND'
     body = '<h1>This page not found<h1>'
     headers = [
@@ -27,6 +27,14 @@ def view_500(error):
 
 
 def application(environ, start_response):
+    # body = 'Request type: {}'.format(environ['QUERY_STRING'])
+    # status = '200 OK'
+    # headers = [
+    #     ('Content-Type', 'text/plain'),
+    #     ('Content-Length', str(len(body)))
+    # ]
+    # start_response(status, headers)
+    # return body
     view = get_view(environ)
     # try:
     status, headers, body = view(Request(environ))
