@@ -70,7 +70,8 @@ class TestTemplateView(BaseView):
     # русский комент
     def get(self, request):
         template = Template(open('templates/test_template.html', 'r').read())
-        body = template.render(test_message=u'Вася Doe')
+        body = str(template.render(test_message=u'Вася Doe').encode('utf-8'))
+        # body = str(u'Вася'.encode('utf-8'))
         return Response(body=body).response()
 
 # class classonlymethod(classmethod):
