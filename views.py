@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
+
 from base import Response, BaseView
+from jinja2 import Template
 
 def test_get_view(request):
-    body = '<h4>Test GET request</h4><br>Params: {}'.format(str(request.data))
-    return Response(body=body).response()
+    body = '<h4>Test GET request</h4><br>Params: {}'.format(unicode(request.data))
+    headers = [
+        ('Content-Type', 'text/html;charset=utf-8'),
+        ('Content-Length', str(len(body)))
+    ]
+    return Response(body=body, headers=headers).response()
 
 def test_post_view(request):
     body = '<h4>Test POST request</h4><br>' \
@@ -59,22 +65,30 @@ class TestView(BaseView):
                '<br>Params: {}'.format(str(request.data))
         return Response(body=body).response()
 
-class classonlymethod(classmethod):
-    def __get__(self, instance, owner):
-        if instance is not None:
-            raise AttributeError("This method is available only on the view class.")
-        return super(classonlymethod, self).__get__(instance, owner)
 
-def call(fun):
-    fun(5,2)
+class TestTemplateView(BaseView):
+    # русский комент
+    def get(self, request):
+        template = Template(open('templates/test_template.html', 'r').read())
+        body = template.render(test_message=u'Вася Doe')
+        return Response(body=body).response()
 
-class TestCallback():
-    @classonlymethod
-    def sum(self, a, b):
-        print a*b+b
-
-    # def __call__(self, a, b):
-    #     self.sum(a,b)
-
-class TC(TestCallback):
-    pass
+# class classonlymethod(classmethod):
+#     def __get__(self, instance, owner):
+#         if instance is not None:
+#             raise AttributeError("This method is available only on the view class.")
+#         return super(classonlymethod, self).__get__(instance, owner)
+#
+# def call(fun):
+#     fun(5,2)
+#
+# class TestCallback():
+#     @classonlymethod
+#     def sum(self, a, b):
+#         print a*b+b
+#
+#     # def __call__(self, a, b):
+#     #     self.sum(a,b)
+#
+# class TC(TestCallback):
+#     pass
